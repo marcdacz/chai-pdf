@@ -1,0 +1,29 @@
+{
+    "name": "chai-pdf",
+    "version": "1.0.0",
+    "description": "Awesome chai plugin for testing PDF files",
+    "author": "Marc Dacanay",
+    "license": "MIT",
+    "main": "./src/chaiPdf.js",
+    "scripts": {
+        "start": "node ./src/chaiPdf.js",
+        "mocha": "node ./node_modules/mocha/bin/mocha",
+        "test": "mocha --opts ./mocha.opts"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/marcdacz/chai-pdf.git"
+    },
+    "homepage": "https://github.com/marcdacz/chai-pdf#readme",
+    "keywords": [
+        "chai",
+        "pdf",
+        "gm"
+    ],
+    "devDependencies": {
+        "mocha": "^6.2.2"
+    },
+    "dependencies": {
+        "chai": "^4.2.0"
+    }
+}
