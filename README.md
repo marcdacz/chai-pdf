@@ -9,5 +9,5 @@ Awesome chai plugin for testing PDF files
 var chai = require('chai');
 chai.use(require('chai-pdf'));
 
-expect("ActualPdfFilename").to.be.samePdfAs("ExpectedPdfFilename)
+await expect("ActualPdfFilename").to.be.samePdfAs("ExpectedPdfFilename)
 ```
