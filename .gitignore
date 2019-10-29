@@ -62,4 +62,3 @@ typings/
 
 # chai-pdf specific ignore
 **/*.png
-**/actual*/**

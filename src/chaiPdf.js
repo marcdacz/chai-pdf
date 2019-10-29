@@ -1,7 +1,8 @@
 const fs = require("fs-extra");
 const path = require("path");
 const gm = require("gm").subClass({ imageMagick: true });
-const looksSame = require("looks-same");
+const PNG = require("pngjs").PNG;
+const pixelmatch = require("pixelmatch");
 
 const config = {
     paths: {
@@ -32,39 +33,24 @@ const pdfToPng = (pdfFilePath, pngFilePath) => {
     });
 };
 
-const comparePngs = async (actual, baseline, diff) => {
+const comparePngs = async (actual, baseline, diff, tolerance = 0) => {
     return new Promise((resolve, reject) => {
-        if (fs.existsSync(baseline)) {
-            looksSame(
-                baseline,
-                actual,
-                { strict: false, ignoreAntialiasing: true, pixelRatio: 1, tolerance: 1 },
-                (error, result) => {
-                    if (error) {
-                        resolve({ result: "failed", actual: actual, baseline: baseline, message: error });
-                    }
-
-                    if (result && result.equal) {
-                        resolve({ result: "passed", actual: actual, baseline: baseline, message: result });
-                    } else {
-                        looksSame.createDiff(
-                            {
-                                reference: baseline,
-                                current: actual,
-                                diff: diff,
-                                highlightColor: "FFFF00",
-                                strict: false,
-                                ignoreAntialiasing: true,
-                                pixelRatio: 1,
-                                tolerance: 1
-                            },
-                            (diffErr) => {
-                                resolve({ result: "failed", actual: actual, baseline: baseline, message: diffErr });
-                            }
-                        );
-                    }
-                }
-            );
+        try {
+            const actualPng = PNG.sync.read(fs.readFileSync(actual));
+            const baselinePng = PNG.sync.read(fs.readFileSync(baseline));
+            const { width, height } = actualPng;
+            const diffPng = new PNG({ width, height });
+            let numDiffPixels = pixelmatch(actualPng.data, baselinePng.data, diffPng.data, width, height, {
+                threshold: 0.1
+            });
+            if (numDiffPixels > tolerance) {
+                fs.writeFileSync(diff, PNG.sync.write(diffPng));
+                resolve({ result: "failed", numDiffPixels: numDiffPixels, diffPng: diff });
+            } else {
+                resolve({ result: "passed" });
+            }
+        } catch (error) {
+            resolve({ result: "failed", actual: actual, error: error });
         }
     });
 };
@@ -112,15 +98,14 @@ module.exports = function(chai, utils) {
         for (let index = 0; index < baselinePngs.length; index++) {
             let actualPng = `${config.paths.actualPngRootFolder}/${actualPdfBaseName}-${index}.png`;
             let baselinePng = `${config.paths.baselinePngRootFolder}/${baselinePdfBaseName}-${index}.png`;
-            let diffPng = `${config.paths.baselinePngRootFolder}/${baselinePdfBaseName}_diff-${index}.png`;
+            let diffPng = `${config.paths.diffPngRootFolder}/${actualPdfBaseName}_diff-${index}.png`;
             comparisonResults.push(await comparePngs(actualPng, baselinePng, diffPng));
         }
 
-        console.log("TCL: comparisonResults", JSON.stringify(comparisonResults));
-
+        let failedResults = comparisonResults.filter((res) => res.result === "failed");
         this.assert(
-            comparisonResults.filter((res) => res.result === "failed").length === 0,
-            `expected #{this} to be same pdf as #{exp}\n${JSON.stringify(comparisonResults)}`,
+            failedResults.length === 0,
+            `expected #{this} to be same pdf as #{exp}\n${JSON.stringify(failedResults)}`,
             `expected #{this} to not be same pdf as #{exp}`,
             baselinePdfFileName,
             actualPdfFileName

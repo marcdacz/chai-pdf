@@ -4,7 +4,11 @@ chai.use(require("chai-as-promised"));
 chai.use(require("../src/chaiPdf"));
 
 describe("Chai-PDF Plugin", () => {
-    it("Should be able to compare PDF", async () => {
-        await expect("actualPdf").to.be.samePdfAs("baselinePdf.pdf");
+    it("Should be able to verify same PDF", async () => {
+        await expect("same.pdf").to.be.samePdfAs("baseline.pdf");
+    });
+
+    it("Should be able to verify not same PDF", async () => {
+        await expect("notSame").to.not.be.samePdfAs("baseline.pdf");
     });
 });
