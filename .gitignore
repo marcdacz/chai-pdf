@@ -62,3 +62,4 @@ typings/
 
 # chai-pdf specific ignore
 **/*.png
+package-lock.json

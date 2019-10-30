@@ -1,6 +1,6 @@
 {
     "name": "chai-pdf",
-    "version": "1.0.1",
+    "version": "1.0.2",
     "description": "Awesome chai plugin for testing PDF files",
     "author": "Marc Dacanay",
     "license": "MIT",
