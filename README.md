@@ -3,6 +3,15 @@
 
 Awesome chai plugin for testing PDF files
 
+## Setup
+Install [GraphicsMagick](http://www.graphicsmagick.org/README.html)
+Install [ImageMagick](https://imagemagick.org/script/download.php)
+Install [GhostScript](https://www.ghostscript.com/download.html)
+
+```
+npm install chai-pdf
+```
+
 ## Usage
 
 ```

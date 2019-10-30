@@ -55,10 +55,10 @@ const comparePngs = async (actual, baseline, diff, tolerance = 0) => {
     });
 };
 
-module.exports = function(chai, utils) {
+module.exports = function (chai, utils) {
     const Assertion = chai.Assertion;
 
-    Assertion.addMethod("samePdfAs", async function(baselinePdfFileName) {
+    Assertion.addMethod("samePdfAs", async function (baselinePdfFileName) {
         let actualPdfFileName = this._obj;
 
         // Ensure Paths Exists
@@ -67,13 +67,27 @@ module.exports = function(chai, utils) {
         // Ensure Pdf Exists
         const actualPdfBaseName = path.parse(actualPdfFileName).name;
         const actualPdfFilePath = `${config.paths.actualPdfRootFolder}/${actualPdfBaseName}.pdf`;
-        const actualPngFilePath = `${config.paths.actualPngRootFolder}/${actualPdfBaseName}.png`;
         new Assertion(fs.pathExistsSync(actualPdfFilePath), `expected ${actualPdfBaseName} to exist`).to.be.true;
 
         const baselinePdfBaseName = path.parse(baselinePdfFileName).name;
         const baselinePdfFilePath = `${config.paths.baselinePdfRootFolder}/${baselinePdfBaseName}.pdf`;
-        const baselinePngFilePath = `${config.paths.baselinePngRootFolder}/${baselinePdfBaseName}.png`;
         new Assertion(fs.pathExistsSync(baselinePdfFilePath), `expected ${baselinePdfBaseName} to exist`).to.be.true;
+
+        // Define Png Paths
+        const actualPngDirPath = `${config.paths.actualPngRootFolder}/${actualPdfBaseName}`;
+        fs.ensureDirSync(actualPngDirPath);
+        fs.emptyDirSync(actualPngDirPath)
+        const actualPngFilePath = `${actualPngDirPath}/${actualPdfBaseName}.png`;
+
+        const baselinePngDirPath = `${config.paths.baselinePngRootFolder}/${baselinePdfBaseName}`;
+        fs.ensureDirSync(baselinePngDirPath);
+        fs.emptyDirSync(baselinePngDirPath)
+        const baselinePngFilePath = `${baselinePngDirPath}/${baselinePdfBaseName}.png`;
+
+        const diffPngDirPath = `${config.paths.diffPngRootFolder}/${actualPdfBaseName}`;
+        fs.ensureDirSync(diffPngDirPath);
+        fs.emptyDirSync(diffPngDirPath)
+
 
         // Convert Pdfs to Pngs
         await pdfToPng(actualPdfFilePath, actualPngFilePath);
@@ -81,10 +95,10 @@ module.exports = function(chai, utils) {
 
         // Get Pngs from Root Folder
         let actualPngs = fs
-            .readdirSync(config.paths.actualPngRootFolder)
+            .readdirSync(actualPngDirPath)
             .filter((pngFile) => path.parse(pngFile).name.startsWith(actualPdfBaseName));
         let baselinePngs = fs
-            .readdirSync(config.paths.baselinePngRootFolder)
+            .readdirSync(baselinePngDirPath)
             .filter((pngFile) => path.parse(pngFile).name.startsWith(baselinePdfBaseName));
 
         // Ensure Actual and Baseline Page counts are the same
@@ -96,9 +110,9 @@ module.exports = function(chai, utils) {
         // Compare all Pngs and collect results
         let comparisonResults = [];
         for (let index = 0; index < baselinePngs.length; index++) {
-            let actualPng = `${config.paths.actualPngRootFolder}/${actualPdfBaseName}-${index}.png`;
-            let baselinePng = `${config.paths.baselinePngRootFolder}/${baselinePdfBaseName}-${index}.png`;
-            let diffPng = `${config.paths.diffPngRootFolder}/${actualPdfBaseName}_diff-${index}.png`;
+            let actualPng = `${actualPngDirPath}/${actualPdfBaseName}-${index}.png`;
+            let baselinePng = `${baselinePngDirPath}/${baselinePdfBaseName}-${index}.png`;
+            let diffPng = `${diffPngDirPath}/${actualPdfBaseName}_diff-${index}.png`;
             comparisonResults.push(await comparePngs(actualPng, baselinePng, diffPng));
         }
 

@@ -1,6 +1,5 @@
 const chai = require("chai");
 const expect = chai.expect;
-chai.use(require("chai-as-promised"));
 chai.use(require("../src/chaiPdf"));
 
 describe("Chai-PDF Plugin", () => {
