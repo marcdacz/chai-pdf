@@ -19,7 +19,10 @@ describe("Chai-PDF Plugin", () => {
 
     it("Should be able to verify not same PDF with Masking", async () => {
         await expect("maskedNotSame").to.not.be.samePdfAs("baseline", {
-            masks: [{ pageIndex: 1, coordinates: { x0: 35, y0: 70, x1: 145, y1: 95 } }]
+            masks: [
+                { pageIndex: 1, coordinates: { x0: 35, y0: 70, x1: 145, y1: 95 } },
+                { pageIndex: 1, coordinates: { x0: 185, y0: 70, x1: 285, y1: 95 } }
+            ]
         });
     });
 });

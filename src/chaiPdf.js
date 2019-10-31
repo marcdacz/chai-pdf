@@ -130,10 +130,13 @@ module.exports = function(chai, utils) {
 
             // If applicable, add masks
             if (pageOptions && pageOptions.masks) {
-                let pageMask = _.find(pageOptions.masks, { pageIndex: index });
-                if (pageMask) {
-                    await addMask(actualPng, pageMask.coordinates, pageMask.color);
-                    await addMask(baselinePng, pageMask.coordinates, pageMask.color);
+                let pageMasks = _.filter(pageOptions.masks, { pageIndex: index });
+                if (pageMasks && pageMasks.length > 0) {
+                    for (const pageMask of pageMasks) {
+                        await addMask(actualPng, pageMask.coordinates, pageMask.color);
+                        await addMask(baselinePng, pageMask.coordinates, pageMask.color);
+                    }
+                   
                 }
             }
 
