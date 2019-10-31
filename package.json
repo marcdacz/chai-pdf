@@ -1,12 +1,11 @@
 {
     "name": "chai-pdf",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "description": "Awesome chai plugin for testing PDF files",
     "author": "Marc Dacanay",
     "license": "MIT",
     "main": "./src/chaiPdf.js",
     "scripts": {
-        "start": "node ./src/chaiPdf.js",
         "mocha": "node ./node_modules/mocha/bin/mocha",
         "test": "mocha --opts ./mocha.opts"
     },
@@ -18,7 +17,8 @@
     "keywords": [
         "chai",
         "pdf",
-        "gm",
+        "graphicsMagick",
+        "imageMagick",
         "chai-pdf",
         "test pdf"
     ],
@@ -30,6 +30,7 @@
         "chai": "^4.2.0",
         "fs-extra": "^8.1.0",
         "gm": "^1.23.1",
+        "lodash": "^4.17.15",
         "pixelmatch": "^5.1.0",
         "pngjs": "^3.4.0"
     }

@@ -1,5 +1,6 @@
 const fs = require("fs-extra");
 const path = require("path");
+const _ = require("lodash");
 const gm = require("gm").subClass({ imageMagick: true });
 const PNG = require("pngjs").PNG;
 const pixelmatch = require("pixelmatch");
@@ -33,6 +34,17 @@ const pdfToPng = (pdfFilePath, pngFilePath) => {
     });
 };
 
+const addMask = (pngFilePath, coordinates = { x0: 0, y0: 0, x1: 0, y1: 0 }, color = "black") => {
+    return new Promise((resolve, reject) => {
+        gm(pngFilePath)
+            .drawRectangle(coordinates.x0, coordinates.y0, coordinates.x1, coordinates.y1)
+            .fill(color)
+            .write(pngFilePath, (err) => {
+                err ? reject(err) : resolve();
+            });
+    });
+};
+
 const comparePngs = async (actual, baseline, diff, tolerance = 0) => {
     return new Promise((resolve, reject) => {
         try {
@@ -55,10 +67,10 @@ const comparePngs = async (actual, baseline, diff, tolerance = 0) => {
     });
 };
 
-module.exports = function (chai, utils) {
+module.exports = function(chai, utils) {
     const Assertion = chai.Assertion;
 
-    Assertion.addMethod("samePdfAs", async function (baselinePdfFileName) {
+    Assertion.addMethod("samePdfAs", async function(baselinePdfFileName, options) {
         let actualPdfFileName = this._obj;
 
         // Ensure Paths Exists
@@ -76,18 +88,17 @@ module.exports = function (chai, utils) {
         // Define Png Paths
         const actualPngDirPath = `${config.paths.actualPngRootFolder}/${actualPdfBaseName}`;
         fs.ensureDirSync(actualPngDirPath);
-        fs.emptyDirSync(actualPngDirPath)
+        fs.emptyDirSync(actualPngDirPath);
         const actualPngFilePath = `${actualPngDirPath}/${actualPdfBaseName}.png`;
 
         const baselinePngDirPath = `${config.paths.baselinePngRootFolder}/${baselinePdfBaseName}`;
         fs.ensureDirSync(baselinePngDirPath);
-        fs.emptyDirSync(baselinePngDirPath)
+        fs.emptyDirSync(baselinePngDirPath);
         const baselinePngFilePath = `${baselinePngDirPath}/${baselinePdfBaseName}.png`;
 
         const diffPngDirPath = `${config.paths.diffPngRootFolder}/${actualPdfBaseName}`;
         fs.ensureDirSync(diffPngDirPath);
-        fs.emptyDirSync(diffPngDirPath)
-
+        fs.emptyDirSync(diffPngDirPath);
 
         // Convert Pdfs to Pngs
         await pdfToPng(actualPdfFilePath, actualPngFilePath);
@@ -107,12 +118,25 @@ module.exports = function (chai, utils) {
             `expected ${actualPdfBaseName} to have same page count as ${baselinePdfBaseName}`
         ).to.equal(baselinePngs.length);
 
+        // Get Options
+        let pageOptions = options;
+
         // Compare all Pngs and collect results
         let comparisonResults = [];
         for (let index = 0; index < baselinePngs.length; index++) {
             let actualPng = `${actualPngDirPath}/${actualPdfBaseName}-${index}.png`;
             let baselinePng = `${baselinePngDirPath}/${baselinePdfBaseName}-${index}.png`;
             let diffPng = `${diffPngDirPath}/${actualPdfBaseName}_diff-${index}.png`;
+
+            // If applicable, add masks
+            if (pageOptions && pageOptions.masks) {
+                let pageMask = _.find(pageOptions.masks, { pageIndex: index });
+                if (pageMask) {
+                    await addMask(actualPng, pageMask.coordinates, pageMask.color);
+                    await addMask(baselinePng, pageMask.coordinates, pageMask.color);
+                }
+            }
+
             comparisonResults.push(await comparePngs(actualPng, baselinePng, diffPng));
         }
 
