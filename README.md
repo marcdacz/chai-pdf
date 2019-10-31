@@ -12,9 +12,18 @@ Install the following system dependencies
 -   [ImageMagick](https://imagemagick.org/script/download.php)
 -   [GhostScript](https://www.ghostscript.com/download.html)
 
+Install npm module
+
 ```
 npm install chai-pdf
 ```
+
+## Folder Structure
+
+Place your actual and baseline pdfs inside the following folders:
+
+-   /data/actualPdfs
+-   /data/baselinePdfs
 
 ## Usage
 
@@ -22,13 +31,14 @@ npm install chai-pdf
 var chai = require('chai');
 chai.use(require('chai-pdf'));
 
+// Compare Pdfs by just indicating their filenamse (with or without extension)
 await expect("ActualPdfFilename").to.be.samePdfAs("ExpectedPdfFilename")
 
+// You can also add options such as page masking
 let options = {
     masks: [
         { pageIndex: 1, coordinates: { x0: 35, y0: 70, x1: 145, y1: 95 } }
     ]
 }
-
 await expect("ActualPdfFilename.pdf").to.be.samePdfAs("ExpectedPdfFilename.pdf", options);
 ```
