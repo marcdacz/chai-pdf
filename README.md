@@ -31,7 +31,7 @@ Place your actual and baseline pdfs inside the following folders:
 var chai = require('chai');
 chai.use(require('chai-pdf'));
 
-// Compare Pdfs by just indicating their filenamse (with or without extension)
+// Compare Pdfs by just indicating their filenames (with or without extension)
 await expect("ActualPdfFilename").to.be.samePdfAs("ExpectedPdfFilename")
 
 // You can also add options such as page masking
