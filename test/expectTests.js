@@ -2,7 +2,7 @@ const chai = require("chai");
 const expect = chai.expect;
 chai.use(require("../src/chaiPdf"));
 
-describe("Chai-PDF Plugin", () => {
+describe("Chai-PDF Plugin using Expect", () => {
     it("Should be able to verify same PDF", async () => {
         await expect("same.pdf").to.be.samePdfAs("baseline.pdf");
     });

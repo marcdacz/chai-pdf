@@ -28,7 +28,9 @@ Place your actual and baseline pdfs inside the following folders:
 ## Usage
 
 ```
-var chai = require('chai');
+// Using BDD style "expect"
+const chai = require('chai');
+const expect = chai.expect;
 chai.use(require('chai-pdf'));
 
 // Compare Pdfs by just indicating their filenames (with or without extension)
@@ -41,4 +43,16 @@ let options = {
     ]
 }
 await expect("ActualPdfFilename.pdf").to.be.samePdfAs("ExpectedPdfFilename.pdf", options);
+
+// Using BDD style "should"
+const chai = require("chai");
+const should = chai.should();
+chai.use(require("../src/chaiPdf"));
+
+let actualFileName = "maskedSame.pdf";
+let baselineFileName = "baseline.pdf";
+let options = {
+     masks: [{ pageIndex: 1, coordinates: { x0: 35, y0: 70, x1: 145, y1: 95 } }]
+};
+await actualFileName.should.be.samePdfAs(baselineFileName, options);
 ```
