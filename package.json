@@ -1,10 +1,10 @@
 {
     "name": "chai-pdf",
-    "version": "1.0.6",
+    "version": "1.0.7",
     "description": "Awesome chai plugin for testing PDF files",
     "author": "Marc Dacanay",
     "license": "MIT",
-    "main": "./src/chaiPdf.js",
+    "main": "index.js",
     "scripts": {
         "mocha": "node ./node_modules/mocha/bin/mocha",
         "test": "mocha --opts ./mocha.opts"

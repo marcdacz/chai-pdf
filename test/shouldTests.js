@@ -1,6 +1,6 @@
 const chai = require("chai");
 const should = chai.should();
-chai.use(require("../src/chaiPdf"));
+chai.use(require("../index"));
 
 describe("Chai-PDF Plugin using Should", () => {
     it("Should be able to verify same PDF", async () => {
