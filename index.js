@@ -124,9 +124,14 @@ module.exports = function(chai, utils) {
         // Compare all Pngs and collect results
         let comparisonResults = [];
         for (let index = 0; index < baselinePngs.length; index++) {
-            let actualPng = `${actualPngDirPath}/${actualPdfBaseName}-${index}.png`;
-            let baselinePng = `${baselinePngDirPath}/${baselinePdfBaseName}-${index}.png`;
-            let diffPng = `${diffPngDirPath}/${actualPdfBaseName}_diff-${index}.png`;
+            let suffix = "";
+            if (baselinePngs.length > 1) {
+                suffix = `-${index}`;
+            }
+
+            let actualPng = `${actualPngDirPath}/${actualPdfBaseName}${suffix}.png`;
+            let baselinePng = `${baselinePngDirPath}/${baselinePdfBaseName}${suffix}.png`;
+            let diffPng = `${diffPngDirPath}/${actualPdfBaseName}_diff${suffix}.png`;
 
             // If applicable, add masks
             if (pageOptions && pageOptions.masks) {
@@ -136,7 +141,6 @@ module.exports = function(chai, utils) {
                         await addMask(actualPng, pageMask.coordinates, pageMask.color);
                         await addMask(baselinePng, pageMask.coordinates, pageMask.color);
                     }
-                   
                 }
             }
 
